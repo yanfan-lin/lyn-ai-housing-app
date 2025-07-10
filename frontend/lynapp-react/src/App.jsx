@@ -1,87 +1,88 @@
-import { BrowserRouter as Router, Routes, Route, Link, NavLink, useNavigate } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/utility/ProtectedRoute';
+import Navigation from './components/Navigation';
+import ScrollToTop from './tools/ScrollToTop';
 import HomePage from './pages/guest/HomePage';
 import PropertiesPage from './pages/guest/PropertiesPage';
 import AboutPage from './pages/guest/AboutPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
-import PropertyDetailPage from './pages/guest/PropertyDetailPage';
 import UserDashboardPage from './pages/user/UserDashboardPage';
+import PropertyDetailPage from './pages/guest/PropertyDetailPage';
 import './App.css';
-import ScrollToTop from './tools/ScrollToTop';
-import { useAuth } from './contexts/AuthContext';
 
-// Navigation component for the main navigation bar
-function Navigation() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { currentUser, logout } = useAuth();
-  const navigate = useNavigate();
-  const dropdownRef = useRef(null);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setIsOpen(false);
-      setIsDropdownOpen(false);
-      window.location.href = '/login';
-    } catch (error) {
-      console.error("Failed to log out", error);
-    }
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    if (isDropdownOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isDropdownOpen]);
-
-  return (
-    <nav className="main-nav">
-      <button className="hamburger" onClick={() => setIsOpen(!isOpen)}>
-        ☰
-      </button>
-      <ul className={isOpen ? 'nav-open' : ''}>
-        <li><NavLink to="/" className="nav-home" onClick={() => setIsOpen(false)}>Home</NavLink></li>
-        <li><NavLink to="/properties" className="nav-properties" onClick={() => setIsOpen(false)}>Properties</NavLink></li>
-        <li><NavLink to="/about" className="nav-about" onClick={() => setIsOpen(false)}>About</NavLink></li>
-
-        {currentUser ? (
-          <li className="nav-user-dropdown" ref={dropdownRef}>
-            <NavLink onClick={() => setIsDropdownOpen(prev => !prev)} className="dropdown-toggle">
-              Hello, {currentUser.email.split('@')[0]} <span className="arrow">▼</span>
-            </NavLink>
-            {isDropdownOpen && (
-              <ul className="dropdown-menu">
-                <li>
-                  <NavLink to="/dashboard" onClick={() => { setIsOpen(false); setIsDropdownOpen(false); }}>
-                    Dashboard
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink onClick={handleLogout} className="dropdown-item-button">Logout</NavLink>
-                </li>
-              </ul>
-            )}
-          </li>
-        ) : (
-          <>
-            <li><NavLink to="/login" className="nav-login" onClick={() => setIsOpen(false)}>Login</NavLink></li>
-            <li><NavLink to="/register" className="nav-register" onClick={() => setIsOpen(false)}>Register</NavLink></li>
-          </>
-        )}
-      </ul>
-    </nav>
-  );
-}
+// // Navigation component for the main navigation bar
+// function Navigation() {
+//   const [isOpen, setIsOpen] = useState(false);
+//   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+//   const { currentUser, logout } = useAuth();
+//   const navigate = useNavigate();
+//   const dropdownRef = useRef(null);
+//
+//   const handleLogout = async () => {
+//     try {
+//       await logout();
+//       setIsOpen(false);
+//       setIsDropdownOpen(false);
+//       window.location.href = '/login';
+//     } catch (error) {
+//       console.error("Failed to log out", error);
+//     }
+//   };
+//
+//   useEffect(() => {
+//     const handleClickOutside = (event) => {
+//       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+//         setIsDropdownOpen(false);
+//       }
+//     };
+//     if (isDropdownOpen) {
+//       document.addEventListener("mousedown", handleClickOutside);
+//     }
+//     return () => {
+//       document.removeEventListener("mousedown", handleClickOutside);
+//     };
+//   }, [isDropdownOpen]);
+//
+//   return (
+//     <nav className="main-nav">
+//       <button className="hamburger" onClick={() => setIsOpen(!isOpen)}>
+//         ☰
+//       </button>
+//       <ul className={isOpen ? 'nav-open' : ''}>
+//         <li><NavLink to="/" className="nav-home" onClick={() => setIsOpen(false)}>Home</NavLink></li>
+//         <li><NavLink to="/properties" className="nav-properties" onClick={() => setIsOpen(false)}>Properties</NavLink></li>
+//         <li><NavLink to="/about" className="nav-about" onClick={() => setIsOpen(false)}>About</NavLink></li>
+//
+//         {currentUser ? (
+//           <li className="nav-user-dropdown" ref={dropdownRef}>
+//             <NavLink onClick={() => setIsDropdownOpen(prev => !prev)} className="dropdown-toggle">
+//               Hello, {currentUser.email.split('@')[0]} <span className="arrow">▼</span>
+//             </NavLink>
+//             {isDropdownOpen && (
+//               <ul className="dropdown-menu">
+//                 <li>
+//                   <NavLink to="/dashboard" onClick={() => { setIsOpen(false); setIsDropdownOpen(false); }}>
+//                     Dashboard
+//                   </NavLink>
+//                 </li>
+//                 <li>
+//                   <NavLink onClick={handleLogout} className="dropdown-item-button">Logout</NavLink>
+//                 </li>
+//               </ul>
+//             )}
+//           </li>
+//         ) : (
+//           <>
+//             <li><NavLink to="/login" className="nav-login" onClick={() => setIsOpen(false)}>Login</NavLink></li>
+//             <li><NavLink to="/register" className="nav-register" onClick={() => setIsOpen(false)}>Register</NavLink></li>
+//           </>
+//         )}
+//       </ul>
+//     </nav>
+//   );
+// }
 
 // This component contains the layout and routes, which need to be inside the Router
 function AppContent() {
@@ -117,7 +118,6 @@ function AppContent() {
   return (
     <>
       <ScrollToTop />
-      {/* Header with logo and navigation */}
       <header className="main-header">
         <div className="container header-container">
           <div className="logo">
@@ -136,7 +136,14 @@ function AppContent() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/dashboard" element={<UserDashboardPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <UserDashboardPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
 
       {/* GTranslate Wrapper Div*/}
@@ -203,9 +210,14 @@ function AppContent() {
 // The main App component now acts as the entry point, setting up the Router
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div style={{ padding: '20px', backgroundColor: 'red', color: 'white' }}>
+          TEST RENDER - If you see this, React is working
+        </div>
+        <AppContent />
+      </Router>
+    </AuthProvider>
   );
 }
 
